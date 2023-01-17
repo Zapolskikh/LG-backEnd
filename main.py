@@ -1,25 +1,25 @@
-from enum import Enum
-
-from fastapi import FastAPI
-
-
-class ModelName(str, Enum):
-    alexnet = "alexnet"
-    resnet = "resnet"
-    lenet = "lenet"
-
+from fastapi import FastAPI, Path
 
 app = FastAPI()
 
-fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+
+word_obj = {
+    1: {
+        "language": "English",
+        "value": "Apple",
+        "difficult": "Easy"
+    }
+}
 
 
-@app.get("/models/{model_name}")
-async def get_model(model_name: ModelName):
-    if model_name is ModelName.alexnet:
-        return {"model_name": model_name, "message": "Deep Learning FTW!"}
+@app.get("/get-item/{item_id}")
+def get_item(item_id: int = Path()):
+    return word_obj[item_id]
 
-    if model_name.value == "lenet":
-        return {"model_name": model_name, "message": "LeCNN all the images"}
 
-    return {"model_name": model_name, "message": "Have some residuals"}
+@app.get("/get-by-value")
+def get_item(value: str):
+    for item_id in word_obj:
+        if word_obj[item_id]["value"] == value:
+            return word_obj[item_id]
+    return {"Word": "Not found"}
